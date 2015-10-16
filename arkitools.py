@@ -82,9 +82,9 @@ def repack_archived_file(infile, backup_file=None, dry_run=False):
             shutil.copyfile(outfile, infile)
 
 
-def which_datasets(infile, dsconf):
+def which_datasets(infiles, dsconf):
     """Given a mergeconf, return the dataset paths that would acquire the
-    file."""
+    files."""
     from configparser import ConfigParser
     from subprocess import check_output, DEVNULL
     cfg = ConfigParser()
@@ -94,7 +94,7 @@ def which_datasets(infile, dsconf):
             continue
         p = cfg.get(s, "path")
         f = cfg.get(s, "filter")
-        r = check_output(["arki-query", "--summary", "--dump", f, infile],
+        r = check_output(["arki-query", "--summary", "--dump", f] + infiles,
                          stderr=DEVNULL)
         if r and not r.isspace():
             yield p
@@ -113,7 +113,7 @@ def do_repack_archived_file(args):
 
 
 def do_which_datasets(args):
-    for ds in which_datasets(infile=args.infile, dsconf=args.conf):
+    for ds in which_datasets(infiles=args.infile, dsconf=args.conf):
         print(ds)
 
 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     # Which dataset
     which_dataset_p = subparsers.add_parser('which-datasets', description="List dataset paths that would acquire the file")
     which_dataset_p.add_argument('conf', help="Config file about input sources")
-    which_dataset_p.add_argument('infile', help="File to inspect")
+    which_dataset_p.add_argument('infile', help="File to inspect", nargs="+")
     which_dataset_p.set_defaults(func=do_which_datasets)
 
     args = parser.parse_args()
