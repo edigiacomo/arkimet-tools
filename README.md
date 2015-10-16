@@ -17,5 +17,5 @@ This command doesn't invoke `arki-check -f` on the dataset.
 **Note**: this command is tested with `ondisk2` datasets only.
 
 ```console
-python3 arkitools.py repack-archived-file file
+python3 arkitools.py repack-archived-file /path/to/dataset/.archive/last/2015/01-01.grib1
 ```
