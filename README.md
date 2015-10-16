@@ -19,3 +19,10 @@ This command doesn't invoke `arki-check -f` on the dataset.
 ```console
 python3 arkitools.py repack-archived-file /path/to/dataset/.archive/last/2015/01-01.grib1
 ```
+
+
+## List datasets that would acquire a file
+
+```console
+python3 arkitools.py which-datasets conf myfile.grib1
+```
