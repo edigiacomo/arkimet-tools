@@ -100,6 +100,21 @@ def which_datasets(infiles, dsconf):
             yield p
 
 
+def match_timeinterval_archivedfile(path, begin, end):
+    """Check if file is within timeinterval.
+
+    TODO: needs optimization.
+    """
+    from subprocess import check_output, DEVNULL
+    q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
+    r = check_output(["arki-query", "--summary", "--dump", q, path],
+                     stderr=DEVNULL)
+    if r and not r.isspace():
+        return True
+    else:
+        return False
+
+
 def do_clone_dataset(args):
     return clone_dataset(src_ds=args.srcds, dst_ds=args.dstds)
 
