@@ -115,6 +115,43 @@ def match_timeinterval_archivedfile(path, begin, end):
         return False
 
 
+def overwrite_archived_data(infiles, dsconf):
+    import json
+    from datetime import datetime
+    from glob import glob
+    from subprocess import check_call, DEVNULL
+
+    # Involved datasets
+    datasets = set(which_datasets(infiles, dsconf))
+    # Check time interval
+    summ = json.loads(subprocess.check_output([
+        "arki-query", "--summary", "--summary-restrict=reftime",
+        "--json", ""] + infiles,
+        stderr=DEVNULL))
+    if len(summ["items"]) == 0:
+        return
+    b = datetime(*summ["items"][0]["summarystats"]["b"])
+    e = datetime(*summ["items"][0]["summarystats"]["e"])
+    # List of archived files involved
+    originals = [
+        f for ds in datasets for f in [
+            f for f in glob("{}/.archive/*/*/*.*".format(ds))
+            if not f.endswith(".metadata") or not f.endswith(".summary")
+        ]
+        if match_timeinterval_archivedfile(f, b, e)
+    ]
+    with tempfile.TemporaryDirectory() as tmpdir:
+        cloned_datasets = []
+        # Create work environment
+        for ds in datasets:
+            cloned_ds = os.path.join(tmpdir, os.path.basename(ds))
+            clone_dataset(ds, cloned_ds)
+            cloned_datasets.append(cloned_ds)
+        # Add error and duplicates
+
+    raise Exception("Not yet implemented!")
+
+
 def do_clone_dataset(args):
     return clone_dataset(src_ds=args.srcds, dst_ds=args.dstds)
 
