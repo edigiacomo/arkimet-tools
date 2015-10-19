@@ -149,7 +149,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
         "arki-query", "--summary", "--summary-restrict=reftime",
         "--json", ""] + infiles).decode("utf-8"))
     if len(summ["items"]) == 0:
-        return
+        return []
     b = datetime(*summ["items"][0]["summarystats"]["b"])
     e = datetime(*summ["items"][0]["summarystats"]["e"])
     # List of archived files involved
