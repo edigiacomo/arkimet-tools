@@ -134,7 +134,7 @@ def archived_file_within_timeinterval(path, begin, end, step=None):
         g = re.match('^.*/(\d{4})/(\d{2})-(\d{2}).*$', abspath)
         b = datetime(*map(int, g.groups()))
         e = b + timedelta(days=1)
-        return all([begin < e, b < end])
+        return all([begin < e, b <= end])
     else:
         raise Exception("Cannot check timeinterval for {}".format(path))
 
