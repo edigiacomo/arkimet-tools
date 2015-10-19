@@ -190,9 +190,11 @@ def overwrite_archived(infiles, dsconf, outfile=None):
                        stdout=fp)
 
         # Import old data
-        check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
-                    "--summary-restrict=reftime"] + originals,
-                   stdout=DEVNULL)
+        if originals:
+            check_call(["arki-scan", "--dispatch="+config, "--dump",
+                        "--summary", "--summary-restrict=reftime"] + originals,
+                       stdout=DEVNULL)
+
         # Import new data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + infiles,
