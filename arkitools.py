@@ -109,7 +109,11 @@ def which_datasets(infiles, dsconf):
 
 
 def guess_step_from_path(path):
-    return None
+    import re
+    if re.match('^.*/(\d{4})/(\d{2})-(\d{2}).*$', path):
+        return "daily"
+    else:
+        return None
 
 
 def archived_file_within_timeinterval(path, begin, end, step=None):
