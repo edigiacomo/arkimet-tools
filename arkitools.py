@@ -108,35 +108,50 @@ def which_datasets(infiles, dsconf):
             yield p
 
 
-def file_within_timeinterval(path, begin, end):
-    """Check if file is within timeinterval.
+def guess_step_from_path(path):
+    return None
 
-    TODO: optimization when path contains reftime info.
 
-    yearly: YY/YYYY
-    monthly: YYYY/mm
-    biweekly: YYYY/mm-{1,2}
-    weekly: YYYY/mm-{1,2,3,4,5}
-    daily: YYYY/mm-dd
-    singlefile: YYYY/mm/dd/HH
-    """
+def archived_file_within_timeinterval(path, begin, end, step=None):
+    # yearly: YY/YYYY
+    # monthly: YYYY/mm
+    # biweekly: YYYY/mm-{1,2}
+    # weekly: YYYY/mm-{1,2,3,4,5}
+    # daily: YYYY/mm-dd
+    # singlefile: YYYY/mm/dd/HH
     import re
     from datetime import datetime, timedelta
     abspath = os.path.abspath(path)
-    result = False
-    # Check daily
-    g = re.match('^.*/(\d{4})/(\d{2})-(\d{2}).*$', abspath)
-    if g:
+
+    if step is None:
+        step = guess_step_from_path(abspath)
+
+    if step == "daily":
+        g = re.match('^.*/(\d{4})/(\d{2})-(\d{2}).*$', abspath)
         b = datetime(*map(int, g.groups()))
         e = b + timedelta(days=1)
-        result = all([begin < e, b < end])
+        return all([begin < e, b < end])
     else:
-        from subprocess import check_output, DEVNULL
-        q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
-        r = check_output(["arki-query", "--summary", "--dump", q, path])
-        result = r and not r.isspace()
+        raise Exception("Cannot check timeinterval for {}".format(path))
 
-    return result
+
+def generic_file_within_timeinterval(path, begin, end):
+    from subprocess import check_output, DEVNULL
+    q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
+    r = check_output(["arki-query", "--summary", "--dump", q, path])
+    return r and not r.isspace()
+
+
+def file_within_timeinterval(path, begin, end, archived=False, step=None):
+    """Check if file is within timeinterval."""
+    if archived:
+        try:
+            return archived_file_within_timeinterval(path, begin, end, step)
+        except:
+            return generic_file_within_timeinterval(path, begin, end)
+    else:
+        return generic_file_within_timeinterval(path, begin, end)
+
 
 def overwrite_archived(infiles, dsconf, outfile=None):
     """Create a merge from infiles and archived data involved.
@@ -167,7 +182,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
             f for f in glob("{}/.archive/*/*/*.*".format(ds))
             if not f.endswith(".metadata") and not f.endswith(".summary")
         ]
-        if file_within_timeinterval(f, b, e)
+        if file_within_timeinterval(f, b, e, archived=True)
     ]
     with tempfile.TemporaryDirectory() as tmpdir:
         dsdir = os.path.join(tmpdir, "datasets")
