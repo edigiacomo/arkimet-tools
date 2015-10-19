@@ -182,7 +182,8 @@ def overwrite_archived(infiles, dsconf, outfile=None):
         check_call(["arki-check", "-f", "-r"] + cloned_datasets)
         if outfile is not None:
             # Save new data in outfile
-            check_call(["arki-query", "--data", "-C", config, "-o", outfile, ""])
+            check_call(["arki-query", "--data", "-C", config, "-o",
+                        outfile, ""])
             return originals
         else:
             # Delete original files, copy new archived data in datasets
