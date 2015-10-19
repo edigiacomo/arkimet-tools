@@ -160,7 +160,11 @@ def overwrite_archived(infiles, dsconf):
             check_call(["arki-mergeconf", err_ds, dup_ds] + cloned_datasets,
                        stdout=fp, stderr=DEVNULL)
 
-        # Import data
+        # Import old data
+        check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
+                    "--summary-restrict=reftime"] + originals,
+                    stdout=DEVNULL, stderr=DEVNULL)
+        # Import new data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + infiles,
                     stdout=DEVNULL, stderr=DEVNULL)
