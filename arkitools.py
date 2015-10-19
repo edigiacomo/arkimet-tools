@@ -92,20 +92,20 @@ def repack_archived_file(infile, backup_file=None, dry_run=False):
 
 
 def which_datasets(infiles, dsconf):
-    """Given a mergeconf, return the dataset paths that would acquire the
-    files."""
+    """Given a mergeconf, return the datasets that would acquire the
+    files as a dict."""
     from configparser import ConfigParser
     from subprocess import check_output, DEVNULL
     cfg = ConfigParser()
     cfg.read([dsconf])
-    for s in cfg.sections():
-        if "filter" not in cfg[s] or "path" not in cfg[s]:
+    for s in cfg.keys():
+        section = dict(cfg.items(s))
+        if "filter" not in section or "path" not in section:
             continue
-        p = cfg.get(s, "path")
-        f = cfg.get(s, "filter")
+        f = section.get("filter")
         r = check_output(["arki-query", "--summary", "--dump", f] + infiles)
         if r and not r.isspace():
-            yield p
+            yield section
 
 
 def guess_step_from_path(path):
@@ -171,7 +171,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
     from subprocess import check_call, check_output, DEVNULL
 
     # Involved datasets
-    datasets = set(which_datasets(infiles, dsconf))
+    datasets = list(which_datasets(infiles, dsconf))
     # Check time interval
     summ = json.loads(check_output([
         "arki-query", "--summary", "--summary-restrict=reftime",
@@ -183,18 +183,18 @@ def overwrite_archived(infiles, dsconf, outfile=None):
     # List of archived files involved
     originals = [
         f for ds in datasets for f in [
-            f for f in glob("{}/.archive/*/*/*.*".format(ds))
+            f for f in glob("{}/.archive/*/*/*.*".format(ds["path"]))
             if not f.endswith(".metadata") and not f.endswith(".summary")
         ]
-        if file_within_timeinterval(f, b, e, archived=True)
+        if file_within_timeinterval(f, b, e, archived=True, step=ds["step"])
     ]
     with tempfile.TemporaryDirectory() as tmpdir:
         dsdir = os.path.join(tmpdir, "datasets")
         cloned_datasets = []
         # Create work environment
         for ds in datasets:
-            cloned_ds = os.path.join(dsdir, os.path.basename(ds))
-            clone_dataset(ds, cloned_ds)
+            cloned_ds = os.path.join(dsdir, os.path.basename(ds["path"]))
+            clone_dataset(ds["path"], cloned_ds)
             cloned_datasets.append(cloned_ds)
 
         # Add error and duplicates
@@ -216,8 +216,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
 
         # Import new data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
-                    "--summary-restrict=reftime"] + infiles,
-                   stdout=DEVNULL)
+                    "--summary-restrict=reftime"] + infiles, stdout=DEVNULL)
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
@@ -247,7 +246,7 @@ def do_repack_archived_file(args):
 
 def do_which_datasets(args):
     for ds in which_datasets(infiles=args.infile, dsconf=args.conf):
-        print(ds)
+        print(ds["path"])
 
 
 def do_overwrite_archived(args):
