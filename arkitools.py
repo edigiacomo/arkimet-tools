@@ -153,9 +153,15 @@ def overwrite_archived_data(infiles, dsconf):
         create_dataset(os.path.join(dsdir, "error"), "error")
         create_dataset(os.path.join(dsdir, "duplicates"), "duplicates")
         # Create config file
-        with open(os.path.join(tmpdir, "conf"), "w") as fp:
+        config = os.path.join(tmpdir, "conf")
+        with open(config, "w") as fp:
             check_call(["arki-mergeconf"] + glob("{}/*".format(dsdir)),
-                       stdout=fp)
+                       stdout=fp, stderr=DEVNULL)
+
+        # Import data
+        check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
+                    "--summary-restrict=reftime"] + infiles,
+                    stdout=DEVNULL, stderr=DEVNULL)
 
     raise Exception("Not yet implemented!")
 
