@@ -115,7 +115,7 @@ def match_timeinterval_archivedfile(path, begin, end):
         return False
 
 
-def overwrite_archived_data(infiles, dsconf):
+def overwrite_archived(infiles, dsconf):
     import json
     from datetime import datetime
     from glob import glob
