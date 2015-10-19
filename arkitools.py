@@ -67,9 +67,9 @@ def repack_archived_file(infile, backup_file=None, dry_run=False):
             check_call(["arki-mergeconf", dst_ds, err_ds, dup_ds], stdout=fp)
 
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
-                    "--summary-restrict=reftime", infile])
-        check_call(["arki-check", "-f", dst_ds])
-        check_call(["arki-check", "-f", "-r", dst_ds])
+                    "--summary-restrict=reftime", infile], stdout=DEVNULL)
+        check_call(["arki-check", "-f", dst_ds], stdout=DEVNULL)
+        check_call(["arki-check", "-f", "-r", dst_ds], stdout=DEVNULL)
         pattern = "/".join(os.path.normpath(
             os.path.abspath(infile)
         ).split(os.sep)[-2:])
@@ -103,8 +103,7 @@ def which_datasets(infiles, dsconf):
             continue
         p = cfg.get(s, "path")
         f = cfg.get(s, "filter")
-        r = check_output(["arki-query", "--summary", "--dump", f] + infiles,
-                         stderr=DEVNULL)
+        r = check_output(["arki-query", "--summary", "--dump", f] + infiles)
         if r and not r.isspace():
             yield p
 
@@ -116,8 +115,7 @@ def match_timeinterval_archivedfile(path, begin, end):
     """
     from subprocess import check_output, DEVNULL
     q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
-    r = check_output(["arki-query", "--summary", "--dump", q, path],
-                     stderr=DEVNULL)
+    r = check_output(["arki-query", "--summary", "--dump", q, path])
     if r and not r.isspace():
         return True
     else:
@@ -142,8 +140,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
     # Check time interval
     summ = json.loads(check_output([
         "arki-query", "--summary", "--summary-restrict=reftime",
-        "--json", ""] + infiles,
-        stderr=DEVNULL).decode("utf-8"))
+        "--json", ""] + infiles).decode("utf-8"))
     if len(summ["items"]) == 0:
         return
     b = datetime(*summ["items"][0]["summarystats"]["b"])
@@ -174,23 +171,23 @@ def overwrite_archived(infiles, dsconf, outfile=None):
         config = os.path.join(tmpdir, "conf")
         with open(config, "w") as fp:
             check_call(["arki-mergeconf", err_ds, dup_ds] + cloned_datasets,
-                       stdout=fp, stderr=DEVNULL)
+                       stdout=fp)
 
         # Import old data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + originals,
-                   stdout=DEVNULL, stderr=DEVNULL)
+                   stdout=DEVNULL)
         # Import new data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + infiles,
-                   stdout=DEVNULL, stderr=DEVNULL)
+                   stdout=DEVNULL)
         # arki-check
-        check_call(["arki-check", "-f"] + cloned_datasets)
-        check_call(["arki-check", "-f", "-r"] + cloned_datasets)
+        check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
+        check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
         if outfile is not None:
             # Save new data in outfile
             check_call(["arki-query", "--data", "-C", config, "-o",
-                        outfile, ""])
+                        outfile, ""], stdout=DEVNULL)
         else:
             # Delete original files, copy new archived data in datasets,
             # arki-check the datasets and import the remaining inline data.
