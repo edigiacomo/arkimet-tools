@@ -217,8 +217,8 @@ def do_which_datasets(args):
 
 
 def do_overwrite_archived(args):
-    for f in ovewrite_archived(infiles=args.infile, dsconf=args.conf,
-                               outfile=args.outfile):
+    for f in overwrite_archived(infiles=args.infile, dsconf=args.conf,
+                                outfile=args.outfile):
         print(f)
 
 
@@ -271,7 +271,7 @@ if __name__ == '__main__':
     )
     overwrite_archived_p.add_argument('conf',
                                       help="Config file about input sources")
-    overwrite_archived_p.add_argument('infiles', help="File to import", nargs="+")
+    overwrite_archived_p.add_argument('infile', help="File to import", nargs="+")
     overwrite_archived_p.set_defaults(func=do_overwrite_archived)
 
     args = parser.parse_args()
