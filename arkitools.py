@@ -108,10 +108,17 @@ def which_datasets(infiles, dsconf):
             yield p
 
 
-def match_timeinterval_archivedfile(path, begin, end):
+def file_within_timeinterval(path, begin, end):
     """Check if file is within timeinterval.
 
-    TODO: needs optimization.
+    TODO: optimization when path contains reftime info.
+
+    yearly: YY/YYYY
+    monthly: YYYY/mm
+    biweekly: YYYY/mm-{1,2}
+    weekly: YYYY/mm-{1,2,3,4,5}
+    daily: YYYY/mm-dd
+    singlefile: YYYY/mm/dd/HH
     """
     from subprocess import check_output, DEVNULL
     q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
@@ -151,7 +158,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
             f for f in glob("{}/.archive/*/*/*.*".format(ds))
             if not f.endswith(".metadata") and not f.endswith(".summary")
         ]
-        if match_timeinterval_archivedfile(f, b, e)
+        if file_within_timeinterval(f, b, e)
     ]
     with tempfile.TemporaryDirectory() as tmpdir:
         dsdir = os.path.join(tmpdir, "datasets")
