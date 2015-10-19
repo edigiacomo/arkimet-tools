@@ -177,6 +177,10 @@ def overwrite_archived(infiles, dsconf):
             new_file = os.path.join(dsdir, o.split(os.sep))[-2:]
             shutil.copyfile(new_file, old_file)
 
+        # TODO: import inline data in original datasets
+        # arki-check on original datasets
+        check_call(["arki-check", "-f", "-C"] + datasets)
+
     raise Exception("Not yet implemented!")
 
 
