@@ -36,7 +36,8 @@ def clone_dataset(src_ds, dst_ds):
     """Clone a dataset."""
     validate_dataset(src_ds)
     os.makedirs(dst_ds)
-    shutil.copyfile(os.path.join(src_ds, "config"), os.path.join(dst_ds, "config"))
+    shutil.copyfile(os.path.join(src_ds, "config"),
+                    os.path.join(dst_ds, "config"))
 
 
 def create_dataset(ds, ds_type="error", ds_step="daily"):
@@ -53,7 +54,8 @@ def repack_archived_file(infile, backup_file=None, dry_run=False):
     from glob import glob
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        src_ds = os.path.abspath(os.path.join(os.path.dirname(infile), "..", "..", ".."))
+        src_ds = os.path.abspath(os.path.join(os.path.dirname(infile),
+                                              "..", "..", ".."))
         dst_ds = os.path.join(tmpdir, os.path.basename(src_ds))
         err_ds = os.path.join(tmpdir, "error")
         dup_ds = os.path.join(tmpdir, "duplicates")
@@ -68,10 +70,17 @@ def repack_archived_file(infile, backup_file=None, dry_run=False):
                     "--summary-restrict=reftime", infile])
         check_call(["arki-check", "-f", dst_ds])
         check_call(["arki-check", "-f", "-r", dst_ds])
-        pattern = "/".join(os.path.normpath(os.path.abspath(infile)).split(os.sep)[-2:])
-        f = glob("{}/{}".format(dst_ds, pattern)) + glob("{}/.archive/last/{}".format(dst_ds, pattern))
+        pattern = "/".join(os.path.normpath(
+            os.path.abspath(infile)
+        ).split(os.sep)[-2:])
+        f = glob("{}/{}".format(dst_ds, pattern))
+        f.extent(glob("{}/.archive/last/{}".format(dst_ds, pattern)))
         if len(f) != 1:
-            raise Exception("Expected one file archived, found {}: {}".format(len(f), ",".join(f)))
+            raise Exception(
+                "Expected one file archived, found {}: {}".format(
+                    len(f), ",".join(f)
+                )
+            )
         outfile = f[0]
         if dry_run is True:
             print("Would copy {} to {}".format(outfile, infile))
@@ -90,7 +99,7 @@ def which_datasets(infiles, dsconf):
     cfg = ConfigParser()
     cfg.read([dsconf])
     for s in cfg.sections():
-        if not "filter" in cfg[s] or not "path" in cfg[s]:
+        if "filter" not in cfg[s] or "path" not in cfg[s]:
             continue
         p = cfg.get(s, "path")
         f = cfg.get(s, "filter")
@@ -163,11 +172,11 @@ def overwrite_archived(infiles, dsconf):
         # Import old data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + originals,
-                    stdout=DEVNULL, stderr=DEVNULL)
+                   stdout=DEVNULL, stderr=DEVNULL)
         # Import new data
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + infiles,
-                    stdout=DEVNULL, stderr=DEVNULL)
+                   stdout=DEVNULL, stderr=DEVNULL)
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets)
@@ -212,20 +221,31 @@ if __name__ == '__main__':
         dest="command", help='sub-command help')
     subparsers.required = True
     # Clone dataset
-    clone_dataset_p = subparsers.add_parser('clone-dataset', description='Clone a dataset (without data)')
+    clone_dataset_p = subparsers.add_parser(
+        'clone-dataset', description='Clone a dataset (without data)'
+    )
     clone_dataset_p.add_argument('srcds', help='Source dataset')
     clone_dataset_p.add_argument('dstds', help='Destination dataset')
 
     # Repack archived file
-    repack_archived_file_p = subparsers.add_parser('repack-archived-file', description="Repack and archived file")
-    repack_archived_file_p.add_argument("-n", "--dry-run", action="store_true", help="Dry run")
-    repack_archived_file_p.add_argument("-b", "--backup-file", help="Save original data")
+    repack_archived_file_p = subparsers.add_parser(
+        'repack-archived-file',
+        description="Repack and archived file"
+    )
+    repack_archived_file_p.add_argument("-n", "--dry-run",
+                                        action="store_true", help="Dry run")
+    repack_archived_file_p.add_argument("-b", "--backup-file",
+                                        help="Save original data")
     repack_archived_file_p.add_argument("infile", help="File to repack")
     repack_archived_file_p.set_defaults(func=do_repack_archived_file)
 
     # Which dataset
-    which_dataset_p = subparsers.add_parser('which-datasets', description="List dataset paths that would acquire the file")
-    which_dataset_p.add_argument('conf', help="Config file about input sources")
+    which_dataset_p = subparsers.add_parser(
+        'which-datasets',
+        description="List dataset paths that would acquire the file"
+    )
+    which_dataset_p.add_argument('conf',
+                                 help="Config file about input sources")
     which_dataset_p.add_argument('infile', help="File to inspect", nargs="+")
     which_dataset_p.set_defaults(func=do_which_datasets)
 
