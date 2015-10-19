@@ -164,6 +164,9 @@ def overwrite_archived(infiles, dsconf):
         check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
                     "--summary-restrict=reftime"] + infiles,
                     stdout=DEVNULL, stderr=DEVNULL)
+        # arki-check
+        check_call(["arki-check", "-f"] + cloned_datasets)
+        check_call(["arki-check", "-f", "-r"] + cloned_datasets)
 
     raise Exception("Not yet implemented!")
 
