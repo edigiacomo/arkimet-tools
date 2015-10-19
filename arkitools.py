@@ -157,13 +157,10 @@ def file_within_timeinterval(path, begin, end, archived=False, step=None):
         return generic_file_within_timeinterval(path, begin, end)
 
 
-def overwrite_archived(infiles, dsconf, outfile=None):
+def merge_data(infiles, dsconf, outfile):
     """Create a merge from infiles and archived data involved.
-    If outfile is not None, the overwritten data are saved in it.
 
-    Return the archived data involved in the process.
-
-    TODO: when outfile is None, the function should handle the overwrite.
+    Return the archived data involved in the process that must be deleted.
     """
     import json
     from datetime import datetime
@@ -220,15 +217,9 @@ def overwrite_archived(infiles, dsconf, outfile=None):
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
-        if outfile is not None:
-            # Save new data in outfile
-            check_call(["arki-query", "--data", "-C", config, "-o",
-                        outfile, ""], stdout=DEVNULL)
-        else:
-            # Delete original files, copy new archived data in datasets,
-            # arki-check the datasets and import the remaining inline data.
-            raise Exception("Not yet implemented")
-
+        # Save new data in outfile
+        check_call(["arki-query", "--data", "-C", config, "-o",
+                    outfile, ""], stdout=DEVNULL)
         return originals
 
 
@@ -249,10 +240,11 @@ def do_which_datasets(args):
         print(ds["path"])
 
 
-def do_overwrite_archived(args):
-    for f in overwrite_archived(infiles=args.infile, dsconf=args.conf,
-                                outfile=args.outfile):
-        print(f)
+def do_merge_data(args):
+    with open(args.to_delete_file, "w") as fp:
+        for f in merge_data(infiles=args.infile, dsconf=args.conf,
+                            outfile=args.outfile):
+            fp.write(f + "\n")
 
 
 if __name__ == '__main__':
@@ -294,18 +286,21 @@ if __name__ == '__main__':
     which_dataset_p.add_argument('infile', help="File to inspect", nargs="+")
     which_dataset_p.set_defaults(func=do_which_datasets)
 
-    # Overwrite archived data
-    overwrite_archived_p = subparsers.add_parser(
-        'overwrite-archived',
-        description="Created merged data from new files and datasets",
+    # Merge data
+    merge_data_p = subparsers.add_parser(
+        'merge-data',
+        description=(
+            "Create a file with merged data and print a list of files "
+            "to delete"
+        )
     )
-    overwrite_archived_p.add_argument(
-        '-o', '--outfile', help="Outfile where merged data are saved"
-    )
-    overwrite_archived_p.add_argument('conf',
-                                      help="Config file about input sources")
-    overwrite_archived_p.add_argument('infile', help="File to import", nargs="+")
-    overwrite_archived_p.set_defaults(func=do_overwrite_archived)
+    merge_data_p.add_argument("-d", "--to-delete-file", required=True,
+                              help="Save list of files to delete")
+    merge_data_p.add_argument('-o', '--outfile', required=True,
+                              help="Outfile where merged data are saved")
+    merge_data_p.add_argument('conf', help="Arkimet config file")
+    merge_data_p.add_argument('infile', help="File to import", nargs="+")
+    merge_data_p.set_defaults(func=do_merge_data)
 
     args = parser.parse_args()
     args.func(args)
