@@ -120,14 +120,23 @@ def file_within_timeinterval(path, begin, end):
     daily: YYYY/mm-dd
     singlefile: YYYY/mm/dd/HH
     """
-    from subprocess import check_output, DEVNULL
-    q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
-    r = check_output(["arki-query", "--summary", "--dump", q, path])
-    if r and not r.isspace():
-        return True
+    import re
+    from datetime import datetime, timedelta
+    abspath = os.path.abspath(path)
+    result = False
+    # Check daily
+    g = re.match('^.*/(\d{4})/(\d{2})-(\d{2}).*$', abspath)
+    if g:
+        b = datetime(*map(int, g.groups()))
+        e = b + timedelta(days=1)
+        result = all([begin < e, b < end])
     else:
-        return False
+        from subprocess import check_output, DEVNULL
+        q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
+        r = check_output(["arki-query", "--summary", "--dump", q, path])
+        result = r and not r.isspace()
 
+    return result
 
 def overwrite_archived(infiles, dsconf, outfile=None):
     """Create a merge from infiles and archived data involved.
