@@ -186,8 +186,8 @@ def overwrite_archived(infiles, dsconf, outfile=None):
                         outfile, ""])
             return originals
         else:
-            # Delete original files, copy new archived data in datasets
-            # and import the remaining inline data.
+            # Delete original files, copy new archived data in datasets,
+            # arki-check the datasets and import the remaining inline data.
             raise Exception("Not yet implemented")
 
 
