@@ -125,6 +125,13 @@ def match_timeinterval_archivedfile(path, begin, end):
 
 
 def overwrite_archived(infiles, dsconf, outfile=None):
+    """Create a merge from infiles and archived data involved.
+    If outfile is not None, the overwritten data are saved in it.
+
+    Return the archived data involved in the process.
+
+    TODO: when outfile is None, the function should handle the overwrite.
+    """
     import json
     from datetime import datetime
     from glob import glob
@@ -184,11 +191,12 @@ def overwrite_archived(infiles, dsconf, outfile=None):
             # Save new data in outfile
             check_call(["arki-query", "--data", "-C", config, "-o",
                         outfile, ""])
-            return originals
         else:
             # Delete original files, copy new archived data in datasets,
             # arki-check the datasets and import the remaining inline data.
             raise Exception("Not yet implemented")
+
+        return originals
 
 
 def do_clone_dataset(args):
@@ -209,8 +217,9 @@ def do_which_datasets(args):
 
 
 def do_overwrite_archived(args):
-    ovewrite_archived(infiles=args.infile, dsconf=args.conf,
-                      outfile=args.outfile)
+    for f in ovewrite_archived(infiles=args.infile, dsconf=args.conf,
+                               outfile=args.outfile):
+        print(f)
 
 
 if __name__ == '__main__':
