@@ -140,10 +140,10 @@ def overwrite_archived(infiles, dsconf, outfile=None):
     # Involved datasets
     datasets = set(which_datasets(infiles, dsconf))
     # Check time interval
-    summ = json.loads(subprocess.check_output([
+    summ = json.loads(check_output([
         "arki-query", "--summary", "--summary-restrict=reftime",
         "--json", ""] + infiles,
-        stderr=DEVNULL))
+        stderr=DEVNULL).decode("utf-8"))
     if len(summ["items"]) == 0:
         return
     b = datetime(*summ["items"][0]["summarystats"]["b"])
