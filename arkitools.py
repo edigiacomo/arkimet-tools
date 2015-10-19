@@ -135,7 +135,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
     import json
     from datetime import datetime
     from glob import glob
-    from subprocess import check_call, DEVNULL
+    from subprocess import check_call, check_output, DEVNULL
 
     # Involved datasets
     datasets = set(which_datasets(infiles, dsconf))
