@@ -208,6 +208,11 @@ def do_which_datasets(args):
         print(ds)
 
 
+def do_overwrite_archived(args):
+    ovewrite_archived(infiles=args.infile, dsconf=args.conf,
+                      outfile=args.outfile)
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
 
@@ -246,6 +251,19 @@ if __name__ == '__main__':
                                  help="Config file about input sources")
     which_dataset_p.add_argument('infile', help="File to inspect", nargs="+")
     which_dataset_p.set_defaults(func=do_which_datasets)
+
+    # Overwrite archived data
+    overwrite_archived_p = subparsers.add_parser(
+        'overwrite-archived',
+        description="Created merged data from new files and datasets",
+    )
+    overwrite_archived_p.add_argument(
+        '-o', '--outfile', help="Outfile where merged data are saved"
+    )
+    overwrite_archived_p.add_argument('conf',
+                                      help="Config file about input sources")
+    overwrite_archived_p.add_argument('infiles', help="File to import", nargs="+")
+    overwrite_archived_p.set_defaults(func=do_overwrite_archived)
 
     args = parser.parse_args()
     args.func(args)
