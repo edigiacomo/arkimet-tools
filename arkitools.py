@@ -150,12 +150,14 @@ def overwrite_archived(infiles, dsconf):
             cloned_datasets.append(cloned_ds)
 
         # Add error and duplicates
-        create_dataset(os.path.join(dsdir, "error"), "error")
-        create_dataset(os.path.join(dsdir, "duplicates"), "duplicates")
+        err_ds = os.path.join(dsdir, "error")
+        dup_ds = os.path.join(dsdir, "duplicates")
+        create_dataset(err_ds, "error")
+        create_dataset(dup_ds, "duplicates")
         # Create config file
         config = os.path.join(tmpdir, "conf")
         with open(config, "w") as fp:
-            check_call(["arki-mergeconf"] + glob("{}/*".format(dsdir)),
+            check_call(["arki-mergeconf", err_ds, dup_ds] + cloned_datasets,
                        stdout=fp, stderr=DEVNULL)
 
         # Import data
