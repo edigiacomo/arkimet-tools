@@ -124,7 +124,7 @@ def match_timeinterval_archivedfile(path, begin, end):
         return False
 
 
-def overwrite_archived(infiles, dsconf):
+def overwrite_archived(infiles, dsconf, outfile=None):
     import json
     from datetime import datetime
     from glob import glob
@@ -180,17 +180,14 @@ def overwrite_archived(infiles, dsconf):
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets)
-        # Overwrite original data
-        # TODO: remove old data and then copy all new data
-        for old_file in originals:
-            new_file = os.path.join(dsdir, o.split(os.sep))[-2:]
-            shutil.copyfile(new_file, old_file)
-
-        # TODO: import inline data in original datasets
-        # arki-check on original datasets
-        check_call(["arki-check", "-f", "-C"] + datasets)
-
-    raise Exception("Not yet implemented!")
+        if outfile is not None:
+            # Save new data in outfile
+            check_call(["arki-query", "--data", "-C", config, "-o", outfile, ""])
+            return originals
+        else:
+            # Delete original files, copy new archived data in datasets
+            # and import the remaining inline data.
+            raise Exception("Not yet implemented")
 
 
 def do_clone_dataset(args):
