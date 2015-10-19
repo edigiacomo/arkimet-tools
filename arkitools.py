@@ -152,7 +152,7 @@ def overwrite_archived(infiles, dsconf, outfile=None):
     originals = [
         f for ds in datasets for f in [
             f for f in glob("{}/.archive/*/*/*.*".format(ds))
-            if not f.endswith(".metadata") or not f.endswith(".summary")
+            if not f.endswith(".metadata") and not f.endswith(".summary")
         ]
         if match_timeinterval_archivedfile(f, b, e)
     ]
