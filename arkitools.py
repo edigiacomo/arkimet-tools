@@ -141,12 +141,14 @@ def overwrite_archived_data(infiles, dsconf):
         if match_timeinterval_archivedfile(f, b, e)
     ]
     with tempfile.TemporaryDirectory() as tmpdir:
+        dsdir = os.path.join(tmpdir, "datasets")
         cloned_datasets = []
         # Create work environment
         for ds in datasets:
-            cloned_ds = os.path.join(tmpdir, os.path.basename(ds))
+            cloned_ds = os.path.join(dsdir, os.path.basename(ds))
             clone_dataset(ds, cloned_ds)
             cloned_datasets.append(cloned_ds)
+
         # Add error and duplicates
 
     raise Exception("Not yet implemented!")
