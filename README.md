@@ -20,9 +20,14 @@ This command doesn't invoke `arki-check -f` on the dataset.
 python3 arkitools.py repack-archived-file /path/to/dataset/.archive/last/2015/01-01.grib1
 ```
 
-
 ## List datasets that would acquire a file
 
 ```console
 python3 arkitools.py which-datasets conf myfile.grib1
 ```
+
+
+## Merge new data with archived datasets
+
+```console
+python3 arkitools.py merge-data --outfile=merged.grib1 --to-delete-file=todelete conf input1.grib1 input2.grib1
