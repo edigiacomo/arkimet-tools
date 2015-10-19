@@ -172,6 +172,7 @@ def overwrite_archived(infiles, dsconf):
         check_call(["arki-check", "-f"] + cloned_datasets)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets)
         # Overwrite original data
+        # TODO: remove old data and then copy all new data
         for old_file in originals:
             new_file = os.path.join(dsdir, o.split(os.sep))[-2:]
             shutil.copyfile(new_file, old_file)
