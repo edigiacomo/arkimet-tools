@@ -74,7 +74,7 @@ def repack_archived_file(infile, backup_file=None, dry_run=False):
             os.path.abspath(infile)
         ).split(os.sep)[-2:])
         f = glob("{}/{}".format(dst_ds, pattern))
-        f.extent(glob("{}/.archive/last/{}".format(dst_ds, pattern)))
+        f.extend(glob("{}/.archive/last/{}".format(dst_ds, pattern)))
         if len(f) != 1:
             raise Exception(
                 "Expected one file archived, found {}: {}".format(
