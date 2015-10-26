@@ -163,7 +163,7 @@ def naif_merger(old_data, new_data, new_dsconf, old_dsconf):
     # Import old data
     if old_dsconf:
         check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump",
-                    "--summary", "--summary-restrict=reftime"] + old_dsconf,
+                    "--summary", "--summary-restrict=reftime"] + old_data,
                    stdout=DEVNULL)
 
     # Import new data
