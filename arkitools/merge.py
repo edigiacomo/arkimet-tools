@@ -17,6 +17,7 @@
 #
 # Author: Emanuele Di Giacomo <edigiacomo@arpa.emr.it>
 
+
 def merge_data(infiles, dsconf, merger, writer):
     """Create a merge from infiles and archived data involved.
 
@@ -92,7 +93,8 @@ def merge_data(infiles, dsconf, merger, writer):
                new_dsconf=config)
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
-        check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
+        check_call(["arki-check", "-f", "-r"] + cloned_datasets,
+                   stdout=DEVNULL)
         # write data
         writer(old_data=originals, new_data=infiles, old_dsconf=dsconf,
                new_dsconf=config)
@@ -160,8 +162,8 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
                 outfp.write(",".join(row) + "\n")
 
             outfp.flush()
-            check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump", "--summary",
-                        "--summary-restrict=reftime", outfp.name], stdout=DEVNULL)
+            check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump",
+                        outfp.name], stdout=DEVNULL)
 
 
 class ReportMergedWriter(object):

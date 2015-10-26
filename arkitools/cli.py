@@ -105,11 +105,11 @@ def main():
                                       choices=["simple", "vm2flags"],
                                       default="simple")
     report_merged_data_p.add_argument("-d", "--to-delete-file", required=True,
-                              help="Save list of files to delete")
+                                      help="Save list of files to delete")
     report_merged_data_p.add_argument('-o', '--outfile', required=True,
-                              help="Outfile where merged data are saved")
+                                      help="Merged data file")
     report_merged_data_p.add_argument('conf', help="Arkimet config file")
-    report_merged_data_p.add_argument('infile', help="File to import", nargs="+")
+    report_merged_data_p.add_argument('infile', help="Input file", nargs="+")
     report_merged_data_p.set_defaults(func=do_report_merged_data)
 
     args = parser.parse_args()

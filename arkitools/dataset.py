@@ -100,7 +100,7 @@ def is_archived_file_within_timeinterval(path, begin, end, step=None):
 
 def is_generic_file_within_timeinterval(path, begin, end):
     """Check if file is within timeinterval, using arki-query."""
-    from subprocess import check_output, DEVNULL
+    from subprocess import check_output
     q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
     r = check_output(["arki-query", "--summary", "--dump", q, path])
     return r and not r.isspace()
@@ -117,7 +117,8 @@ def is_file_within_timeinterval(path, begin, end, archived=False, step=None):
         return is_generic_file_within_timeinterval(path, begin, end)
 
 
-def repack_archived_file(infile, backup_file=None, dry_run=False, tmpbasedir=None):
+def repack_archived_file(infile, backup_file=None, dry_run=False,
+                         tmpbasedir=None):
     """Repack an archived file."""
     from subprocess import check_call, DEVNULL
     from glob import glob
