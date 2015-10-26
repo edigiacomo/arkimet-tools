@@ -100,7 +100,7 @@ def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
     """Merger for merge_data."""
     from subprocess import check_call, DEVNULL
     # Import old data
-    if old_dsconf:
+    if old_data:
         check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump",
                     "--summary", "--summary-restrict=reftime"] + old_data,
                    stdout=DEVNULL)
