@@ -157,10 +157,41 @@ def file_within_timeinterval(path, begin, end, archived=False, step=None):
         return generic_file_within_timeinterval(path, begin, end)
 
 
-def merge_data(infiles, dsconf, outfile):
+def naif_merger(old_data, new_data, old_dsconf, new_dsconf):
+    """Merger for merge_data."""
+    from subprocess import check_call, DEVNULL
+    # Import old data
+    if old_dsconf:
+        check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump",
+                    "--summary", "--summary-restrict=reftime"] + old_dsconf,
+                   stdout=DEVNULL)
+
+    # Import new data
+    check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump", "--summary",
+                "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
+
+
+def merge_data(infiles, dsconf, merger, writer=None):
     """Create a merge from infiles and archived data involved.
 
-    Return the archived data involved in the process that must be deleted.
+    - infiles: list of new files to merge
+    - dsconf: datasets involved
+    - merger: policy for mergeing (if None, overwrite).
+    - writer: policy for writing the results (if None, do nothing).
+
+    The merger merge the old and new data in a temporary dataset.
+    It is a callable with the following parameters:
+    - old_data: list of old files involved in the merge
+    - new_data: list of new files involved in the merge
+    - old_dsconf: dsconf of the original datasets
+    - new_dsconf: dsconf where the resulting data must be merged by the merger
+
+    The writer write the merged data. It is a callable with the following
+    parameters:
+    - old_data: list of old files involved in the merge
+    - new_data: list of new files involved in the merge
+    - old_dsconf: dsconf of the original datasets
+    - new_dsconf: dsconf where the resulting data are merged
     """
     import json
     from datetime import datetime
@@ -205,15 +236,6 @@ def merge_data(infiles, dsconf, outfile):
             check_call(["arki-mergeconf", err_ds, dup_ds] + cloned_datasets,
                        stdout=fp)
 
-        # Import old data
-        if originals:
-            check_call(["arki-scan", "--dispatch="+config, "--dump",
-                        "--summary", "--summary-restrict=reftime"] + originals,
-                       stdout=DEVNULL)
-
-        # Import new data
-        check_call(["arki-scan", "--dispatch="+config, "--dump", "--summary",
-                    "--summary-restrict=reftime"] + infiles, stdout=DEVNULL)
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
@@ -244,7 +266,7 @@ def do_which_datasets(args):
 def do_merge_data(args):
     with open(args.to_delete_file, "w") as fp:
         for f in merge_data(infiles=args.infile, dsconf=args.conf,
-                            outfile=args.outfile):
+                            outfile=args.outfile, merger=naif_merger):
             fp.write(f + "\n")
 
 
