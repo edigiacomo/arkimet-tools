@@ -115,55 +115,70 @@ def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
                 "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
 
 
-def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
-    """Merge flags for VM2 data."""
-    import sqlite3
-    from tempfile import NamedTemporaryFile
-    import csv
-    from subprocess import check_call, DEVNULL
+class Vm2FlagsMerger(object):
+    def __init__(self, flags="all"):
+        self.flags = flags
 
-    with NamedTemporaryFile() as dbfp:
-        db = sqlite3.connect(dbfp.name)
-        db.execute((
-            "CREATE TABLE vm2 "
-            "(d varchar, s varchar, v varchar, "
-            " v1 varchar, v2 varchar, v3 varchar, "
-            " f varchar);"
-        ))
-        db.commit()
-        for f in old_data:
-            with open(f) as fp:
-                reader = csv.reader(fp)
-                for row in reader:
-                    row[0] = row[0][0:14]
+    @property
+    def flags_sql(self):
+        if flags == "all":
+            return "?"
+        elif flags = "B33196":
+            return "substr(?, 1) || substr(f, 2)"
+        else:
+            raise Exception("Not a valid flag: {}".format(self.flags))
 
-                    db.execute("INSERT INTO vm2 VALUES (?, ?, ?, ?, ?, ?, ?)",
-                               row)
-
+    def __call__(old_data, new_data, old_dsconf, new_dsconf):
+        """Merge flags for VM2 data."""
+        import sqlite3
+        from tempfile import NamedTemporaryFile
+        import csv
+        from subprocess import check_call, DEVNULL
+        with NamedTemporaryFile() as dbfp:
+            db = sqlite3.connect(dbfp.name)
+            db.execute((
+                "CREATE TABLE vm2 "
+                "(d varchar, s varchar, v varchar, "
+                " v1 varchar, v2 varchar, v3 varchar, "
+                " f varchar);"
+            ))
             db.commit()
+            for f in old_data:
+                with open(f) as fp:
+                    reader = csv.reader(fp)
+                    for row in reader:
+                        row[0] = row[0][0:14]
+                        db.execute(
+                            "INSERT INTO vm2 VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            row
+                        )
 
-        for f in new_data:
-            with open(f) as fp:
-                reader = csv.reader(fp)
-                for row in reader:
-                    row[0] = row[0][0:14]
+                db.commit()
 
-                    db.execute(
-                        "UPDATE vm2 SET f = ? WHERE d = ? AND s = ? AND v = ?",
-                        (row[6], row[0], row[1], row[2])
-                    )
+            for f in new_data:
+                with open(f) as fp:
+                    reader = csv.reader(fp)
+                    for row in reader:
+                        row[0] = row[0][0:14]
 
-            db.commit()
+                        db.execute((
+                            "UPDATE vm2 SET f = {}"
+                            "WHERE d = ? AND s = ? AND v = ?"
+                        ).format(self.flags_sql, (
+                            row[6], row[0], row[1], row[2])
+                        ))
 
-        cur = db.cursor()
-        cur.execute("SELECT * FROM vm2")
-        with NamedTemporaryFile("w", suffix=".vm2") as outfp:
-            for row in cur:
-                outfp.write(",".join(row) + "\n")
+                db.commit()
 
-            outfp.flush()
-            check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump",
-                        outfp.name], stdout=DEVNULL)
+            cur = db.cursor()
+            cur.execute("SELECT * FROM vm2")
+            with NamedTemporaryFile("w", suffix=".vm2") as outfp:
+                for row in cur:
+                    outfp.write(",".join(row) + "\n")
+
+                outfp.flush()
+                check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump",
+                            outfp.name], stdout=DEVNULL)
 
 
 class ReportMergedWriter(object):

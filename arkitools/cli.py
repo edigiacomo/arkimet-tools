@@ -33,7 +33,8 @@ def do_report_merged_data(args):
 
     merger = {
         "simple": simple_merger,
-        "vm2flags": vm2_flags_merger,
+        "vm2flags": Vm2FlagsMerger("all"),
+        "vm2flags-B33196": Vm2FlagsMerger("B33196"),
     }.get(args.merger_type)
 
     merge_data(infiles=args.infile, dsconf=args.conf,
@@ -102,7 +103,8 @@ def main():
         )
     )
     report_merged_data_p.add_argument("-m", "--merger-type",
-                                      choices=["simple", "vm2flags"],
+                                      choices=["simple", "vm2flags",
+                                               "vm2flags-B33196",],
                                       default="simple")
     report_merged_data_p.add_argument("-d", "--to-delete-file", required=True,
                                       help="Save list of files to delete")
