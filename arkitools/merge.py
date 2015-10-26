@@ -118,12 +118,13 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
     import sqlite3
     from tempfile import NamedTemporaryFile
     import csv
+    from subprocess import check_call, DEVNULL
 
     with NamedTemporaryFile() as dbfp:
         db = sqlite3.connect(dbfp.name)
         db.execute((
             "CREATE TABLE vm2 "
-            "(d datetime, s integer, v integer, "
+            "(d varchar, s varchar, v varchar, "
             " v1 varchar, v2 varchar, v3 varchar, "
             " f varchar);"
         ))
@@ -132,7 +133,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
             with open(f) as fp:
                 reader = csv.reader(fp)
                 for row in reader:
-                    row[0] = row[0][0:12]
+                    row[0] = row[0][0:14]
 
                     db.execute("INSERT INTO vm2 VALUES (?, ?, ?, ?, ?, ?, ?)",
                                row)
@@ -143,7 +144,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
             with open(f) as fp:
                 reader = csv.reader(fp)
                 for row in reader:
-                    row[0] += row[0][0:12]
+                    row[0] += row[0][0:14]
 
                     db.execute(
                         "UPDATE vm2 SET f = ? WHERE d = ? AND s = ? AND v = ?",
@@ -152,13 +153,14 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
 
             db.commit()
 
-        db.execute("SELECT * FROM vm2")
-        with NamedTemporaryFile() as outfp:
-            for row in db.fetchall():
+        cur = db.cursor()
+        cur.execute("SELECT * FROM vm2")
+        with NamedTemporaryFile("w", suffix=".vm2") as outfp:
+            for row in cur:
                 outfp.write(",".join(row))
 
             check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump", "--summary",
-                        "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
+                        "--summary-restrict=reftime", outfp.name], stdout=DEVNULL)
 
 
 class ReportMergedWriter(object):
