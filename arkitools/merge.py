@@ -159,6 +159,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
             for row in cur:
                 outfp.write(",".join(row) + "\n")
 
+            outfp.flush()
             check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump", "--summary",
                         "--summary-restrict=reftime", outfp.name], stdout=DEVNULL)
 
