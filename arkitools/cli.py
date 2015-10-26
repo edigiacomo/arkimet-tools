@@ -27,7 +27,7 @@ def do_which_datasets(args):
 
 def do_report_merged_data(args):
     from arkitools.merge import (
-        merge_data, simple_merger, vm2_flags_merger,
+        merge_data, simple_merger, Vm2FlagsMerger,
         ReportMergedWriter,
     )
 
