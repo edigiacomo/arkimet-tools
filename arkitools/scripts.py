@@ -26,7 +26,15 @@ def do_which_datasets(args):
 
 
 def do_report_merged_data(args):
-    from arkitools.merge import merge_data, simple_merger, ReportMergedWriter
+    from arkitools.merge import (
+        merge_data, simple_merger, vm2_flags_merger,
+        ReportMergedWriter,
+    )
+
+    if args.merger_type == "simple":
+        merger = simple_merger
+    else:
+        merger = vm2_flags_merger
 
     writer = ReportMergedWriter(outfile, to_delete_file)
     merge_data(infiles=args.infile, dsconf=args.conf,
@@ -94,6 +102,9 @@ if __name__ == '__main__':
             "to delete"
         )
     )
+    report_merged_data_p.add_argument("-m", "--merger-type",
+                                      choices=["simple", "vm2flags"],
+                                      default="simple")
     report_merged_data_p.add_argument("-d", "--to-delete-file", required=True,
                               help="Save list of files to delete")
     report_merged_data_p.add_argument('-o', '--outfile', required=True,
