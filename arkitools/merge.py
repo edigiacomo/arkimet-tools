@@ -158,7 +158,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
                         "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
 
 
-def ReportMergedWriter(object):
+class ReportMergedWriter(object):
     """Writer for merge_data.
 
     Save the merged data in outfile and list the archived file to delete."""
