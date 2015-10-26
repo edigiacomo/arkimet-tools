@@ -110,6 +110,54 @@ def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
                 "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
 
 
+def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
+    """Merge flags for VM2 data."""
+    import sqlite3
+    from tempfile import NamedTemporaryFile
+    import csv
+
+    with NamedTemporaryFile() as dbfp:
+        db = sqlite3.connect(dbfp.name)
+        db.execute((
+            "CREATE TABLE vm2 "
+            "(d datetime, s integer, v integer, "
+            " v1 varchar, v2 varchar, v3 varchar, "
+            " f varchar);"
+        ))
+        db.commit()
+        for f in old_data:
+            with open(f) as fp:
+                reader = csv.reader(fp)
+                for row in reader:
+                    row[0] = row[0][0:12]
+
+                    db.execute("INSERT INTO vm2 VALUES (?, ?, ?, ?, ?, ?, ?)",
+                               row)
+
+            db.commit()
+
+        for f in new_data:
+            with open(f) as fp:
+                reader = csv.reader(fp)
+                for row in reader:
+                    row[0] += row[0][0:12]
+
+                    db.execute(
+                        "UPDATE vm2 SET f = ? WHERE d = ? AND s = ? AND v = ?",
+                        row[6], row[0], row[1], row[2]
+                    )
+
+            db.commit()
+
+        db.execute("SELECT * FROM vm2")
+        with NamedTemporaryFile() as outfp:
+            for row in db.fetchall():
+                outfp.write(",".join(row))
+
+            check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump", "--summary",
+                        "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
+
+
 def ReportMergedWriter(object):
     """Writer for merge_data.
 
