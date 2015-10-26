@@ -52,7 +52,7 @@ def do_repack_archived_file(args):
     )
 
 
-if __name__ == '__main__':
+def main():
     from argparse import ArgumentParser
 
     parser = ArgumentParser(description='Arkimet tools')
@@ -114,3 +114,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == '__main__':
+    main()
