@@ -171,7 +171,7 @@ def naif_merger(old_data, new_data, new_dsconf, old_dsconf):
                 "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
 
 
-def merge_data(infiles, dsconf, merger, writer=None):
+def merge_data(infiles, dsconf, merger, outfile, writer=None):
     """Create a merge from infiles and archived data involved.
 
     - infiles: list of new files to merge
@@ -186,7 +186,7 @@ def merge_data(infiles, dsconf, merger, writer=None):
     - old_dsconf: dsconf of the original datasets
     - new_dsconf: dsconf where the resulting data must be merged by the merger
 
-    The writer write the merged data. It is a callable with the following
+    TODO: The writer write the merged data. It is a callable with the following
     parameters:
     - old_data: list of old files involved in the merge
     - new_data: list of new files involved in the merge
