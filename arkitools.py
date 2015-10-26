@@ -48,12 +48,12 @@ def create_dataset(ds, ds_type="error", ds_step="daily"):
         out.write("step = {}\n".format(ds_step))
 
 
-def repack_archived_file(infile, backup_file=None, dry_run=False):
+def repack_archived_file(infile, backup_file=None, dry_run=False, tmpbasedir=None):
     """Repack an archived file."""
     from subprocess import check_call, DEVNULL
     from glob import glob
 
-    with tempfile.TemporaryDirectory() as tmpdir:
+    with tempfile.TemporaryDirectory(dir=tmpbasedir) as tmpdir:
         src_ds = os.path.abspath(os.path.join(os.path.dirname(infile),
                                               "..", "..", ".."))
         dst_ds = os.path.join(tmpdir, os.path.basename(src_ds))
@@ -231,7 +231,8 @@ def do_repack_archived_file(args):
     return repack_archived_file(
         infile=args.infile,
         backup_file=args.backup_file,
-        dry_run=args.dry_run
+        dry_run=args.dry_run,
+        tmpbasedir=args.tmpdir
     )
 
 
@@ -269,6 +270,8 @@ if __name__ == '__main__':
         'repack-archived-file',
         description="Repack and archived file"
     )
+    repack_archived_file_p.add_argument("-p", "--tmpdir",
+                                        help="Temporary directory prefix")
     repack_archived_file_p.add_argument("-n", "--dry-run",
                                         action="store_true", help="Dry run")
     repack_archived_file_p.add_argument("-b", "--backup-file",
