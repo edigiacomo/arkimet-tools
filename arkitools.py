@@ -157,7 +157,7 @@ def file_within_timeinterval(path, begin, end, archived=False, step=None):
         return generic_file_within_timeinterval(path, begin, end)
 
 
-def naif_merger(old_data, new_data, old_dsconf, new_dsconf):
+def naif_merger(old_data, new_data, new_dsconf, old_dsconf):
     """Merger for merge_data."""
     from subprocess import check_call, DEVNULL
     # Import old data
