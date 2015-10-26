@@ -40,6 +40,7 @@ def merge_data(infiles, dsconf, merger, writer):
     - new_dsconf: dsconf where the resulting data are merged
     """
     import json
+    import tempfile
     from datetime import datetime
     from glob import glob
     from subprocess import check_call, check_output, DEVNULL
