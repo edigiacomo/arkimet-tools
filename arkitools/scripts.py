@@ -31,7 +31,7 @@ def do_report_merged_data(args):
     writer = ReportMergedWriter(outfile, to_delete_file)
     merge_data(infiles=args.infile, dsconf=args.conf,
                merger=simple_merger,
-               writer=ReportMergedWriter(args.outfile args.to_delete_file))
+               writer=ReportMergedWriter(args.outfile, args.to_delete_file))
 
 
 def do_repack_archived_file(args):
