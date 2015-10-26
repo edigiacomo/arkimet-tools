@@ -4,9 +4,9 @@ Tools for [arkimet](https://github.com/ARPA-SIMC/arkimet).
 
 ## Install
 
-Install the version `0.1` with pip:
+Install the version `0.2` with pip:
 
-    pip install git+https://github.com/edigiacomo/arkimet-tools@v0.1
+    pip install git+https://github.com/edigiacomo/arkimet-tools@v0.2
 
 
 ## Clone an empty dataset
