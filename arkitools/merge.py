@@ -157,7 +157,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
         cur.execute("SELECT * FROM vm2")
         with NamedTemporaryFile("w", suffix=".vm2") as outfp:
             for row in cur:
-                outfp.write(",".join(row))
+                outfp.write(",".join(row) + "\n")
 
             check_call(["arki-scan", "--dispatch="+new_dsconf, "--dump", "--summary",
                         "--summary-restrict=reftime", outfp.name], stdout=DEVNULL)
