@@ -36,7 +36,6 @@ def do_report_merged_data(args):
     else:
         merger = vm2_flags_merger
 
-    writer = ReportMergedWriter(outfile, to_delete_file)
     merge_data(infiles=args.infile, dsconf=args.conf,
                merger=simple_merger,
                writer=ReportMergedWriter(args.outfile, args.to_delete_file))
