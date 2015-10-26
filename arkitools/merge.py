@@ -144,7 +144,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
             with open(f) as fp:
                 reader = csv.reader(fp)
                 for row in reader:
-                    row[0] += row[0][0:14]
+                    row[0] = row[0][0:14]
 
                     db.execute(
                         "UPDATE vm2 SET f = ? WHERE d = ? AND s = ? AND v = ?",
