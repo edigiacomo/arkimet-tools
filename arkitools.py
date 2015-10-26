@@ -171,7 +171,7 @@ def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
                 "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
 
 
-def merge_data(infiles, dsconf, merger, outfile, writer=None):
+def merge_data(infiles, dsconf, merger, writer):
     """Create a merge from infiles and archived data involved.
 
     - infiles: list of new files to merge
@@ -235,16 +235,15 @@ def merge_data(infiles, dsconf, merger, outfile, writer=None):
         with open(config, "w") as fp:
             check_call(["arki-mergeconf", err_ds, dup_ds] + cloned_datasets,
                        stdout=fp)
-
+        # merge data
         merger(old_data=originals, new_data=infiles, old_dsconf=dsconf,
                new_dsconf=config)
-
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
-        # Save new data in outfile
-        check_call(["arki-query", "--data", "-C", config, "-o",
-                    outfile, ""], stdout=DEVNULL)
+        # write data
+        writer(old_data=originals, new_data=infiles, old_dsconf=dsconf,
+               new_dsconf=config)
         return originals
 
 
@@ -267,10 +266,20 @@ def do_which_datasets(args):
 
 
 def do_merge_data(args):
-    with open(args.to_delete_file, "w") as fp:
-        for f in merge_data(infiles=args.infile, dsconf=args.conf,
-                            outfile=args.outfile, merger=simple_merger):
-            fp.write(f + "\n")
+    outfile = args.outfile
+    to_delete_file = args.to_delete_file
+
+    def report_merger(old_data, new_data, old_dsconf, new_dsconf):
+        from subprocess import check_call, DEVNULL
+        # Save new data in outfile
+        check_call(["arki-query", "--data", "-C", new_dsconf, "-o",
+                    outfile, ""], stdout=DEVNULL)
+        with open(to_delete_file, "w") as fp:
+            for f in old_data:
+                fp.write(f + "\n")
+
+    merge_data(infiles=args.infile, dsconf=args.conf,
+               merger=simple_merger, writer=report_merger)
 
 
 if __name__ == '__main__':
