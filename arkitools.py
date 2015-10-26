@@ -157,7 +157,7 @@ def file_within_timeinterval(path, begin, end, archived=False, step=None):
         return generic_file_within_timeinterval(path, begin, end)
 
 
-def naif_merger(old_data, new_data, new_dsconf, old_dsconf):
+def simple_merger(old_data, new_data, new_dsconf, old_dsconf):
     """Merger for merge_data."""
     from subprocess import check_call, DEVNULL
     # Import old data
@@ -269,7 +269,7 @@ def do_which_datasets(args):
 def do_merge_data(args):
     with open(args.to_delete_file, "w") as fp:
         for f in merge_data(infiles=args.infile, dsconf=args.conf,
-                            outfile=args.outfile, merger=naif_merger):
+                            outfile=args.outfile, merger=simple_merger):
             fp.write(f + "\n")
 
 
