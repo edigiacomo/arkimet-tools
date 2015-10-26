@@ -110,11 +110,11 @@ def is_file_within_timeinterval(path, begin, end, archived=False, step=None):
     """Check if file is within timeinterval."""
     if archived:
         try:
-            return archived_file_within_timeinterval(path, begin, end, step)
+            return is_archived_file_within_timeinterval(path, begin, end, step)
         except:
-            return generic_file_within_timeinterval(path, begin, end)
+            return is_generic_file_within_timeinterval(path, begin, end)
     else:
-        return generic_file_within_timeinterval(path, begin, end)
+        return is_generic_file_within_timeinterval(path, begin, end)
 
 
 def repack_archived_file(infile, backup_file=None, dry_run=False, tmpbasedir=None):
