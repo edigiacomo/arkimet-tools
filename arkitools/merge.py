@@ -147,7 +147,7 @@ def vm2_flags_merger(old_data, new_data, old_dsconf, new_dsconf):
 
                     db.execute(
                         "UPDATE vm2 SET f = ? WHERE d = ? AND s = ? AND v = ?",
-                        row[6], row[0], row[1], row[2]
+                        (row[6], row[0], row[1], row[2])
                     )
 
             db.commit()
