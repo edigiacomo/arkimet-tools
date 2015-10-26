@@ -39,6 +39,7 @@ def merge_data(infiles, dsconf, merger, writer):
     - old_dsconf: dsconf of the original datasets
     - new_dsconf: dsconf where the resulting data are merged
     """
+    import os
     import json
     import tempfile
     from datetime import datetime
