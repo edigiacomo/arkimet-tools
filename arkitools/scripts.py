@@ -31,13 +31,13 @@ def do_report_merged_data(args):
         ReportMergedWriter,
     )
 
-    if args.merger_type == "simple":
-        merger = simple_merger
-    else:
-        merger = vm2_flags_merger
+    merger = {
+        "simple": simple_merger,
+        "vm2flags": vm2_flags_merger,
+    }.get(args.merger_type)
 
     merge_data(infiles=args.infile, dsconf=args.conf,
-               merger=simple_merger,
+               merger=merger,
                writer=ReportMergedWriter(args.outfile, args.to_delete_file))
 
 
