@@ -123,7 +123,7 @@ class Vm2FlagsMerger(object):
     def flags_sql(self):
         if flags == "all":
             return "?"
-        elif flags = "B33196":
+        elif flags == "B33196":
             return "substr(?, 1) || substr(f, 2)"
         else:
             raise Exception("Not a valid flag: {}".format(self.flags))
