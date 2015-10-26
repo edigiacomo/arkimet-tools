@@ -236,6 +236,9 @@ def merge_data(infiles, dsconf, merger, writer=None):
             check_call(["arki-mergeconf", err_ds, dup_ds] + cloned_datasets,
                        stdout=fp)
 
+        merger(old_data=originals, new_data=infiles, old_dsconf=dsconf,
+               new_dsconf=config)
+
         # arki-check
         check_call(["arki-check", "-f"] + cloned_datasets, stdout=DEVNULL)
         check_call(["arki-check", "-f", "-r"] + cloned_datasets, stdout=DEVNULL)
