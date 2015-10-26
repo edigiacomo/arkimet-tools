@@ -40,3 +40,4 @@ You can choose the merge type with `-m TYPE`:
 
 - `simple`: the old data are ovewritten by the new ones.
 - `vm2flags` (**VM2 only**): only `VM2` flags are updated.
+- `vm2flags-B33196` (**VM2 only**): only `B33196` flag is updated.
