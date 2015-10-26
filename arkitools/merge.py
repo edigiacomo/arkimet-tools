@@ -117,18 +117,12 @@ def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
 
 class Vm2FlagsMerger(object):
     def __init__(self, flags="all"):
-        self.flags = flags
+        self.flags_sql = {
+            "all": "?",
+            "B33196": "substr(?, 1, 1) || substr(f, 2)"
+        }[flags]
 
-    @property
-    def flags_sql(self):
-        if flags == "all":
-            return "?"
-        elif flags == "B33196":
-            return "substr(?, 1) || substr(f, 2)"
-        else:
-            raise Exception("Not a valid flag: {}".format(self.flags))
-
-    def __call__(old_data, new_data, old_dsconf, new_dsconf):
+    def __call__(self, old_data, new_data, old_dsconf, new_dsconf):
         """Merge flags for VM2 data."""
         import sqlite3
         from tempfile import NamedTemporaryFile
@@ -164,8 +158,8 @@ class Vm2FlagsMerger(object):
                         db.execute((
                             "UPDATE vm2 SET f = {}"
                             "WHERE d = ? AND s = ? AND v = ?"
-                        ).format(self.flags_sql, (
-                            row[6], row[0], row[1], row[2])
+                        ).format(self.flags_sql), (
+                            row[6], row[0], row[1], row[2]
                         ))
 
                 db.commit()
