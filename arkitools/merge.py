@@ -47,6 +47,7 @@ def merge_data(infiles, dsconf, merger, writer):
     from subprocess import check_call, check_output, DEVNULL
     from .dataset import (
         which_datasets, is_file_within_timeinterval, create_dataset,
+        clone_dataset,
     )
 
     # Involved datasets
