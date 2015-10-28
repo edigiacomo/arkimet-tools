@@ -36,6 +36,13 @@ def do_merge_data(parser, args):
         "vm2flags-B33196": Vm2FlagsMerger("B33196"),
     }.get(args.merger_type)
 
+    if args.writer_type == "report" and any([
+        not args.outfile, not args.to_delete_file
+    ]):
+        parser.error((
+            "Outfile and list of files to delete are "
+            "mandatory with report writer"
+        ))
     writer = {
         "report": ReportMergedWriter(args.outfile, args.to_delete_file),
         "import": ImportWriter(),
