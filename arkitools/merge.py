@@ -115,6 +115,23 @@ def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
                 "--summary-restrict=reftime"] + new_data, stdout=DEVNULL)
 
 
+class DeleteMerger(object):
+    """Merger for merge_data.
+
+    Delete the data matching the query."""
+    def __init__(self, query):
+        self.query = query
+
+    def __call__(self, old_data, new_data, old_dsconf, new_dsconf):
+        from subprocess import check_call, DEVNULL
+        from tempfile import NamedTemporaryFile
+        simple_merger(old_data, new_data, old_dsconf, new_dsconf)
+        with NamedTemporaryFile() as fp:
+            check_call(["arki-query", "-o", fp.name, query, "-C", new_dsconf])
+            fp.flush()
+            check_call(["arki-check", "--remove="+fp.name, "-C", new_dsconf])
+
+
 class Vm2FlagsMerger(object):
     def __init__(self, flags="all"):
         self.flags_sql = {

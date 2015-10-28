@@ -42,6 +42,14 @@ def do_report_merged_data(args):
                writer=ReportMergedWriter(args.outfile, args.to_delete_file))
 
 
+def do_delete_merged_data(args):
+    from arkitools.merge import merge_data, DeleteMerger, ReportMergedWriter
+
+    merge_data(infiles=args.infile, dsconf=args.conf,
+               merger=DeleteMerger(args.query),
+               writer=ReportMergedWriter(args.outfile, args.to_delete_file))
+
+
 def do_repack_archived_file(args):
     from arkitools.dataset import repack_archived_file
 
@@ -105,13 +113,24 @@ def main():
                                       choices=["simple", "vm2flags",
                                                "vm2flags-B33196",],
                                       default="simple")
-    report_merged_data_p.add_argument("-d", "--to-delete-file", required=True,
-                                      help="Save list of files to delete")
-    report_merged_data_p.add_argument('-o', '--outfile', required=True,
-                                      help="Merged data file")
-    report_merged_data_p.add_argument('conf', help="Arkimet config file")
-    report_merged_data_p.add_argument('infile', help="Input file", nargs="+")
+    report_merged_data_p.add_argument("-d", "--to-delete-file", required=True)
+    report_merged_data_p.add_argument('-o', '--outfile', required=True)
+    report_merged_data_p.add_argument('conf')
+    report_merged_data_p.add_argument('infile', nargs='+')
     report_merged_data_p.set_defaults(func=do_report_merged_data)
+
+    # Report delete data
+    report_delete_data_p = subparsers.add_parser(
+        'report-delete-data',
+        description=(
+            "Given a delete query create a file with the cleared data "
+            "and print a list of files to delete."
+        )
+    )
+    report_delete_data_p.add_argument("-d", "--to-delete-file", required=True)
+    report_delete_data_p.add_argument('-o', '--outfile', required=True)
+    report_delete_data_p.add_argument('conf')
+    report_delete_data_p.add_argument('query')
 
     args = parser.parse_args()
     args.func(args)
