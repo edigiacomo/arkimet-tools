@@ -191,3 +191,62 @@ class ReportMergedWriter(object):
         with open(self.todelete, "w") as fp:
             for f in old_data:
                 fp.write(f + "\n")
+
+
+class ImportWriter(object):
+    """Writer for merge_data.
+
+    Import data in datasets: the archived data are overwritten, the
+    online data are imported.
+
+    Note: this writer copy the archived data in "last".
+    """
+    def __call__(self, old_data, new_data, old_dsconf, new_dsconf):
+        from configparser import ConfigParser
+        old_cfg = ConfigParser()
+        old_cfg.read(old_dsconf)
+        new_cfg = ConfigParser()
+        new_cfg.read(new_dsconf)
+        # Remove old files
+        for f in old_data:
+            os.remove(f)
+        # For each new dataset, get the old one and overwrite the archived data
+        for ds in new_cfg.sections():
+            old_ds = dict(old_cfg[ds])
+            new_ds = dict(new_cfg[ds])
+            self.copy_archived(old_ds, new_ds)
+            self.import_online(old_dsconf, new_ds)
+
+    def copy_archived(self, old_ds, new_ds):
+        import os
+        import shutil
+        lastdir = os.path.join(new_ds['path'], '.archive', 'last')
+        lastfiles =
+        for dirpath, dirnames, files in os.walk(lastdir):
+            # Exclude root directory
+            if dirpath == lastdir:
+                continue
+            # Append files to copy
+            lastfiles += [
+                os.path.join(dirpath, f) for f in files
+                if os.path.splitext(f)[1] in [".summary", ".metadata"]:
+            ]
+
+        # Copy file in the original dataset
+        for f in lastfiles:
+            d = os.path.join(old_ds['path'], os.path.relpath(f, new_ds['path']))
+            shutil.copyfile(f, d)
+
+    def import_online(old_dsconf, new_ds):
+        import os
+        from subprocess import check_call, DEVNULL
+        onlinefiles = []
+        for dirpath, dirnames, files in os.walk(new_ds['path']):
+            if dirpath == new_ds['path']:
+                continue
+
+            dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+            onlinefiles += files
+
+        if onlinefiles:
+            check_call(["arki-scan", "--dispatch="+old_dsconf ] + onlinefiles)
