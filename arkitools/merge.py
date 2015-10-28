@@ -219,8 +219,8 @@ class ImportWriter(object):
             new_ds = dict(new_cfg[ds])
             self.copy_archived(old_ds, new_ds)
             self.import_online(old_dsconf, new_ds)
-            check_call(["arki-check", "-f"] + old_ds['path'], stdout=DEVNULL)
-            check_call(["arki-check", "-fr"] + old_ds['path'], stdout=DEVNULL)
+            check_call(["arki-check", "-f", old_ds['path']], stdout=DEVNULL)
+            check_call(["arki-check", "-fr", old_ds['path']], stdout=DEVNULL)
 
     def copy_archived(self, old_ds, new_ds):
         import os
