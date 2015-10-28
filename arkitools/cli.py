@@ -45,7 +45,7 @@ def do_report_merged_data(args):
 def do_report_deleted_data(args):
     from arkitools.merge import merge_data, DeleteMerger, ReportMergedWriter
 
-    merge_data(infiles=args.infile, dsconf=args.conf,
+    merge_data(infiles=None, dsconf=args.conf,
                merger=DeleteMerger(args.query),
                writer=ReportMergedWriter(args.outfile, args.to_delete_file))
 
