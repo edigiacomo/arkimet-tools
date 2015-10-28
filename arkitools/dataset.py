@@ -51,7 +51,7 @@ def create_dataset(ds, ds_type="error", ds_step="daily"):
 
 def which_datasets(infiles, dsconf):
     """Given a mergeconf, return the datasets that would acquire the
-    files as a dict. If infiles is none, return all the datasets."""
+    files as a dict."""
     cfg = configparser.ConfigParser()
     cfg.read([dsconf])
     for s in cfg.keys():
@@ -59,13 +59,10 @@ def which_datasets(infiles, dsconf):
         if "filter" not in section or "path" not in section:
             continue
         f = section.get("filter")
-        if infiles is None:
+        r = subprocess.check_output(["arki-query", "--summary", "--dump",
+                                    f] + infiles)
+        if r and not r.isspace():
             yield section
-        else:
-            r = subprocess.check_output(["arki-query", "--summary", "--dump",
-                                        f] + infiles)
-            if r and not r.isspace():
-                yield section
 
 
 def guess_step_from_path(path):
