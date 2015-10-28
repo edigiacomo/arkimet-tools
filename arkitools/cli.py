@@ -18,14 +18,14 @@
 # Author: Emanuele Di Giacomo <edigiacomo@arpa.emr.it>
 
 
-def do_which_datasets(args):
+def do_which_datasets(parser, args):
     from arkitools.dataset import which_datasets
 
     for ds in which_datasets(infiles=args.infile, dsconf=args.conf):
         print(ds["path"])
 
 
-def do_merge_data(args):
+def do_merge_data(parser, args):
     from arkitools.merge import (
         merge_data, simple_merger, Vm2FlagsMerger,
         ReportMergedWriter, ImportWriter,
@@ -45,7 +45,7 @@ def do_merge_data(args):
                merger=merger, writer=writer)
 
 
-def do_repack_archived_file(args):
+def do_repack_archived_file(parser, args):
     from arkitools.dataset import repack_archived_file
 
     return repack_archived_file(
@@ -113,7 +113,7 @@ def main():
     merge_data_p.set_defaults(func=do_merge_data)
 
     args = parser.parse_args()
-    args.func(args)
+    args.func(parser, args)
 
 
 if __name__ == '__main__':
