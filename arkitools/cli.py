@@ -60,7 +60,7 @@ def main():
     parser.add_argument("--version", action="version", version="%(prog)s 0.1")
 
     subparsers = parser.add_subparsers(title="command", dest="command",
-                                       help='sub-command help')
+                                       help="command to execute")
     subparsers.required = True
     # Clone dataset
     clone_dataset_p = subparsers.add_parser(
