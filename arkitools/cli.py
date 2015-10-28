@@ -42,8 +42,7 @@ def do_merge_data(args):
     }.get(args.writer_type)
 
     merge_data(infiles=args.infile, dsconf=args.conf,
-               merger=merger,
-               writer=ReportMergedWriter(args.outfile, args.to_delete_file))
+               merger=merger, writer=writer)
 
 
 def do_repack_archived_file(args):
@@ -101,10 +100,10 @@ def main():
     merge_data_p = subparsers.add_parser('merge-data', description="Merge data")
     merge_data_p.add_argument("-m", "--merger-type",
                               choices=["simple", "vm2flags",
-                                       "vm2flags-B33196",],
+                                       "vm2flags-B33196"],
                               default="simple")
     merge_data_p.add_argument("-w", "--writer-type",
-                              choices=["report", "import"]
+                              choices=["report", "import"],
                               default="report")
     merge_data_p.add_argument("-d", "--to-delete-file",
                               help="Save list of files to delete")
