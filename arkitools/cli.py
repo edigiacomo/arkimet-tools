@@ -25,17 +25,21 @@ def do_which_datasets(args):
         print(ds["path"])
 
 
-def do_report_merged_data(args):
+def do_merge_data(args):
     from arkitools.merge import (
         merge_data, simple_merger, Vm2FlagsMerger,
-        ReportMergedWriter,
+        ReportMergedWriter, ImportWriter,
     )
-
     merger = {
         "simple": simple_merger,
         "vm2flags": Vm2FlagsMerger("all"),
         "vm2flags-B33196": Vm2FlagsMerger("B33196"),
     }.get(args.merger_type)
+
+    writer = {
+        "report": ReportMergedWriter(args.outfile, args.to_delete_file),
+        "import": ImportWriter(),
+    }.get(args.writer_type)
 
     merge_data(infiles=args.infile, dsconf=args.conf,
                merger=merger,
@@ -93,25 +97,21 @@ def main():
     which_dataset_p.add_argument('infile', help="File to inspect", nargs="+")
     which_dataset_p.set_defaults(func=do_which_datasets)
 
-    # Report merge data
-    report_merged_data_p = subparsers.add_parser(
-        'report-merge-data',
-        description=(
-            "Create a file with merged data and print a list of files "
-            "to delete"
-        )
-    )
-    report_merged_data_p.add_argument("-m", "--merger-type",
-                                      choices=["simple", "vm2flags",
-                                               "vm2flags-B33196",],
-                                      default="simple")
-    report_merged_data_p.add_argument("-d", "--to-delete-file", required=True,
-                                      help="Save list of files to delete")
-    report_merged_data_p.add_argument('-o', '--outfile', required=True,
-                                      help="Merged data file")
-    report_merged_data_p.add_argument('conf', help="Arkimet config file")
-    report_merged_data_p.add_argument('infile', help="Input file", nargs="+")
-    report_merged_data_p.set_defaults(func=do_report_merged_data)
+    # Merge data
+    merge_data_p = subparsers.add_parser('merge-data', description="Merge data")
+    merge_data_p.add_argument("-m", "--merger-type",
+                              choices=["simple", "vm2flags",
+                                       "vm2flags-B33196",],
+                              default="simple")
+    merge_data_p.add_argument("-w", "--writer-type",
+                              choices=["report", "import"]
+                              default="report")
+    merge_data_p.add_argument("-d", "--to-delete-file",
+                              help="Save list of files to delete")
+    merge_data_p.add_argument('-o', '--outfile', help="Merged data file")
+    merge_data_p.add_argument('conf', help="Arkimet config file")
+    merge_data_p.add_argument('infile', help="Input file", nargs="+")
+    merge_data_p.set_defaults(func=do_merge_data)
 
     args = parser.parse_args()
     args.func(args)
