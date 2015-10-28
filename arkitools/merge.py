@@ -239,7 +239,7 @@ class ImportWriter(object):
             d = os.path.join(old_ds['path'], os.path.relpath(f, new_ds['path']))
             shutil.copyfile(f, d)
 
-    def import_online(old_dsconf, new_ds):
+    def import_online(self, old_dsconf, new_ds):
         import os
         from subprocess import check_call
         onlinefiles = []
