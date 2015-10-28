@@ -209,20 +209,18 @@ class ImportWriter(object):
         old_cfg.read(old_dsconf)
         new_cfg = ConfigParser()
         new_cfg.read(new_dsconf)
-        # Remove old files
-        for f in old_data:
-            os.remove(f)
         # For each new dataset, get the old one and overwrite the archived data
         for ds in [s for s in new_cfg.sections()
                    if s not in ["error", "duplicates"]]:
             old_ds = dict(old_cfg[ds])
             new_ds = dict(new_cfg[ds])
-            self.copy_archived(old_ds, new_ds)
+            old_files = [f for f in old_data if f.startswith(old_ds['path'])]
+            self.sync_archived(old_ds, new_ds, old_files)
             self.import_online(old_dsconf, new_ds)
             check_call(["arki-check", "-f", old_ds['path']], stdout=DEVNULL)
             check_call(["arki-check", "-fr", old_ds['path']], stdout=DEVNULL)
 
-    def copy_archived(self, old_ds, new_ds):
+    def sync_archived(self, old_ds, new_ds, old_files):
         import os
         import shutil
         lastdir = os.path.join(new_ds['path'], '.archive', 'last')
@@ -241,7 +239,12 @@ class ImportWriter(object):
         # Copy file in the original dataset
         for f in lastfiles:
             d = os.path.join(old_ds['path'], os.path.relpath(f, new_ds['path']))
+            old_files.remove(d)
             shutil.copyfile(f, d)
+
+        # Remove files in original dataset removed during the merge
+        for f in old_files:
+            os.remove(f)
 
     def import_online(self, old_dsconf, new_ds):
         import os
