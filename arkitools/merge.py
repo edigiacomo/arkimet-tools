@@ -232,7 +232,7 @@ class ImportWriter(object):
             lastfiles += [
                 os.path.join(dirpath, f)
                 for f in files
-                if os.path.splitext(f)[1] in [".summary", ".metadata"]
+                if os.path.splitext(f)[1] not in [".summary", ".metadata"]
             ]
 
         # Copy file in the original dataset
