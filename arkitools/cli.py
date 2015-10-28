@@ -44,10 +44,15 @@ def do_report_merged_data(args):
 
 def do_report_deleted_data(args):
     from arkitools.merge import merge_data, DeleteMerger, ReportMergedWriter
+    from tempfile import NamedTemporaryFile
+    from subprocess import check_call, DEVNULL
 
-    merge_data(infiles=None, dsconf=args.conf,
-               merger=DeleteMerger(args.query),
-               writer=ReportMergedWriter(args.outfile, args.to_delete_file))
+    with NamedTemporaryFile() as fp:
+        check_call(["arki-query", "--data", args.query, "-C", args.conf,
+                    "-o", fp.name], stdout=DEVNULL)
+        merge_data(infiles=[fp.name], dsconf=args.conf,
+                   merger=DeleteMerger(args.query),
+                   writer=ReportMergedWriter(args.outfile, args.to_delete_file))
 
 
 def do_repack_archived_file(args):
