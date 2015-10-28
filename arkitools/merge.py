@@ -202,6 +202,7 @@ class ImportWriter(object):
     Note: this writer copy the archived data in "last".
     """
     def __call__(self, old_data, new_data, old_dsconf, new_dsconf):
+        import os
         from configparser import ConfigParser
         old_cfg = ConfigParser()
         old_cfg.read(old_dsconf)
@@ -221,15 +222,16 @@ class ImportWriter(object):
         import os
         import shutil
         lastdir = os.path.join(new_ds['path'], '.archive', 'last')
-        lastfiles =
+        lastfiles = []
         for dirpath, dirnames, files in os.walk(lastdir):
             # Exclude root directory
             if dirpath == lastdir:
                 continue
             # Append files to copy
             lastfiles += [
-                os.path.join(dirpath, f) for f in files
-                if os.path.splitext(f)[1] in [".summary", ".metadata"]:
+                os.path.join(dirpath, f)
+                for f in files
+                if os.path.splitext(f)[1] in [".summary", ".metadata"]
             ]
 
         # Copy file in the original dataset
@@ -239,7 +241,7 @@ class ImportWriter(object):
 
     def import_online(old_dsconf, new_ds):
         import os
-        from subprocess import check_call, DEVNULL
+        from subprocess import check_call
         onlinefiles = []
         for dirpath, dirnames, files in os.walk(new_ds['path']):
             if dirpath == new_ds['path']:
@@ -249,4 +251,4 @@ class ImportWriter(object):
             onlinefiles += files
 
         if onlinefiles:
-            check_call(["arki-scan", "--dispatch="+old_dsconf ] + onlinefiles)
+            check_call(["arki-scan", "--dispatch="+old_dsconf] + onlinefiles)
