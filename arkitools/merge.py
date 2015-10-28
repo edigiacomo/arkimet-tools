@@ -242,7 +242,7 @@ class ImportWriter(object):
 
     def import_online(self, old_dsconf, new_ds):
         import os
-        from subprocess import check_call
+        from subprocess import check_call, DEVNULL
         onlinefiles = []
         for dirpath, dirnames, files in os.walk(new_ds['path']):
             dirnames[:] = [d for d in dirnames if not d.startswith(".")]
@@ -252,4 +252,5 @@ class ImportWriter(object):
             onlinefiles += [os.path.join(dirpath, f) for f in files]
 
         if onlinefiles:
-            check_call(["arki-scan", "--dispatch="+old_dsconf] + onlinefiles)
+            check_call(["arki-scan", "--dispatch="+old_dsconf] + onlinefiles,
+                       stdout=DEVNULL)
