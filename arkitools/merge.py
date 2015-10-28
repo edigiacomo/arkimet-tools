@@ -212,7 +212,8 @@ class ImportWriter(object):
         for f in old_data:
             os.remove(f)
         # For each new dataset, get the old one and overwrite the archived data
-        for ds in new_cfg.sections():
+        for ds in [s for s in new_cfg.sections()
+                   if s not in ["error", "duplicates"]]:
             old_ds = dict(old_cfg[ds])
             new_ds = dict(new_cfg[ds])
             self.copy_archived(old_ds, new_ds)
