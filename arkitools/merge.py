@@ -33,7 +33,7 @@ def merge_data(infiles, dsconf, merger, writer):
     - old_dsconf: dsconf of the original datasets
     - new_dsconf: dsconf where the resulting data must be merged by the merger
 
-    TODO: The writer write the merged data. It is a callable with the following
+    The writer write the merged data. It is a callable with the following
     parameters:
     - old_data: list of old files involved in the merge
     - new_data: list of new files involved in the merge
