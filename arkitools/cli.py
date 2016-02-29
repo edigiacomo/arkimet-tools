@@ -85,7 +85,7 @@ def main():
     # Repack archived file
     repack_archived_file_p = subparsers.add_parser(
         'repack-archived-file',
-        description="Repack and archived file"
+        description="Repack an archived file"
     )
     repack_archived_file_p.add_argument("-p", "--tmpdir",
                                         help="Temporary directory prefix")
