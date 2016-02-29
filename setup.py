@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="arkimet-tools",
-    version="0.1",
+    version="0.3",
     description="Arkimet tools",
     url="https://github.com/edigiacomo/arkimet-tools",
     author="Emanuele Di Giacomo",
