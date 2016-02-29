@@ -50,3 +50,8 @@ files to delete.
     $ arkitools-cli report-deleted-data --outfile=cleared.grib1 --to-delete-file=todelete.list conf "product: tp"
     $ xargs -a todelete.list -n 10 -d '\n' rm -v   # remove the files from .archive
     $ arki-scan --dispatch=conf merged.grib1
+
+**Note**: this command delete archived data only. For online data:
+
+    $ arki-query "product: tp" -C conf > todelete.md
+    $ arki-check --remove=todelete.md -C conf
