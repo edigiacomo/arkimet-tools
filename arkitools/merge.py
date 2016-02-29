@@ -123,7 +123,7 @@ class DeleteMerger(object):
         self.query = query
 
     def __call__(self, old_data, new_data, old_dsconf, new_dsconf):
-        from subprocess import check_call, DEVNULL
+        from subprocess import check_call
         from tempfile import NamedTemporaryFile
         simple_merger(old_data, new_data, old_dsconf, new_dsconf)
         with NamedTemporaryFile() as fp:
