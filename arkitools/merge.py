@@ -21,17 +21,17 @@
 def merge_data(infiles, dsconf, merger, writer):
     """Create a merge from infiles and archived data involved.
 
-    - infiles: list of new files to merge
-    - dsconf: datasets involved
-    - merger: policy for mergeing (if None, overwrite).
-    - writer: policy for writing the results (if None, do nothing).
+    :param infiles: list of new files to merge.
+    :param dsconf: datasets involved.
+    :param merger: policy for merging.
+    :param writer: policy for writing the results.
 
     The merger merge the old and new data in a temporary dataset.
     It is a callable with the following parameters:
     - old_data: list of old files involved in the merge
     - new_data: list of new files involved in the merge
     - old_dsconf: dsconf of the original datasets
-    - new_dsconf: dsconf where the resulting data must be merged by the merger
+    - new_dsconf: dsconf of the temporary merge dataset.
 
     The writer write the merged data. It is a callable with the following
     parameters:
@@ -102,7 +102,13 @@ def merge_data(infiles, dsconf, merger, writer):
 
 
 def simple_merger(old_data, new_data, old_dsconf, new_dsconf):
-    """Merger for merge_data."""
+    """Merger for merge_data.
+
+    :param old_data: list of old files involved in the merge.
+    :param new_data: list of new files involved in the merge.
+    :param old_dsconf: dsconf of the original datasets.
+    :param new_dsconf: dsconf of the temporary merge dataset.
+    """
     from subprocess import check_call, DEVNULL
     # Import old data
     if old_data:
@@ -134,6 +140,9 @@ class DeleteMerger(object):
 
 
 class Vm2FlagsMerger(object):
+    """Merger for merge_data.
+
+    Merge VM2 flags."""
     def __init__(self, flags="all"):
         self.flags_sql = {
             "all": "?",
@@ -141,7 +150,6 @@ class Vm2FlagsMerger(object):
         }[flags]
 
     def __call__(self, old_data, new_data, old_dsconf, new_dsconf):
-        """Merge flags for VM2 data."""
         import sqlite3
         from tempfile import NamedTemporaryFile
         import csv

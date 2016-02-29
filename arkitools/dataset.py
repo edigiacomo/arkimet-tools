@@ -26,7 +26,10 @@ from datetime import datetime, timedelta
 
 
 def validate_dataset(ds):
-    """Raise exception if the given path is not a valid dataset."""
+    """Raise exception if the given path is not a valid dataset.
+
+    :param ds: path of the dataset to validate.
+    """
     if not os.path.isdir(ds):
         raise Exception("Invalid dataset: {} is not a directory".format(ds))
     if not os.path.exists(os.path.join(ds, "config")):
@@ -34,7 +37,11 @@ def validate_dataset(ds):
 
 
 def clone_dataset(src_ds, dst_ds):
-    """Clone a dataset, without the data."""
+    """Clone a dataset, without the data.
+
+    :param src_ds: path of the dataset to clone.
+    :param dst_ds: path of the resulting dataset.
+    """
     validate_dataset(src_ds)
     os.makedirs(dst_ds)
     shutil.copyfile(os.path.join(src_ds, "config"),
@@ -42,7 +49,12 @@ def clone_dataset(src_ds, dst_ds):
 
 
 def create_dataset(ds, ds_type="error", ds_step="daily"):
-    """Create a dataset. Useful for create error or duplicates dataset."""
+    """Create a dataset. Useful for create error or duplicates dataset.
+
+    :param ds: path of the dataset to create.
+    :param ds_type: type of the dataset.
+    :param ds_step: step of the dataset.
+    """
     os.makedirs(ds)
     with open(os.path.join(ds, "config"), "w") as out:
         out.write("type = {}\n".format(ds_type))
@@ -51,7 +63,11 @@ def create_dataset(ds, ds_type="error", ds_step="daily"):
 
 def which_datasets(infiles, dsconf):
     """Given a mergeconf, return the datasets that would acquire the
-    files as a dict."""
+    files as a dict.
+
+    :param infiles: list of files to check.
+    :param dsconf: path of the mergeconf file.
+    """
     cfg = configparser.ConfigParser()
     cfg.read([dsconf])
     for s in cfg.keys():
@@ -67,7 +83,10 @@ def which_datasets(infiles, dsconf):
 
 def guess_step_from_path(path):
     """Guess datasets step from path of one of its files. Return None if cannot
-    guess."""
+    guess.
+
+    :param path: path of the file.
+    """
     if re.match('^.*/(\d{4})/(\d{2})-(\d{2}).*$', path):
         return "daily"
     else:
@@ -77,7 +96,13 @@ def guess_step_from_path(path):
 def is_archived_file_within_timeinterval(path, begin, end, step=None):
     """Check if the archived file is within the given timeinterval using, if
     possible, the file path as reftime metadata. If step is None, try to guess
-    its step."""
+    its step.
+
+    :param path: path of the file.
+    :param begin: datetime object representing the beginning of the interval.
+    :param end: datetime object representing the end of the interval.
+    :param step: step of the archived file (if None, try to guess it).
+    """
     # yearly: YY/YYYY
     # monthly: YYYY/mm
     # biweekly: YYYY/mm-{1,2}
@@ -99,7 +124,12 @@ def is_archived_file_within_timeinterval(path, begin, end, step=None):
 
 
 def is_generic_file_within_timeinterval(path, begin, end):
-    """Check if file is within timeinterval, using arki-query."""
+    """Check if file is within timeinterval, using arki-query.
+
+    :param path: path of the file.
+    :param begin: datetime object representing the beginning of the interval.
+    :param end: datetime object representing the end of the interval.
+    """
     from subprocess import check_output
     q = "reftime:>={},<={}".format(begin.isoformat(), end.isoformat())
     r = check_output(["arki-query", "--summary", "--dump", q, path])
@@ -107,7 +137,14 @@ def is_generic_file_within_timeinterval(path, begin, end):
 
 
 def is_file_within_timeinterval(path, begin, end, archived=False, step=None):
-    """Check if file is within timeinterval."""
+    """Check if file is within timeinterval.
+
+    :param path: path of the file.
+    :param begin: datetime object representing the beginning of the interval.
+    :param end: datetime object representing the end of the interval.
+    :param archived: True if the file is in .archive False otherwise
+    :param step: step of the archived file (if None, try to guess it).
+    """
     if archived:
         try:
             return is_archived_file_within_timeinterval(path, begin, end, step)
@@ -119,7 +156,13 @@ def is_file_within_timeinterval(path, begin, end, archived=False, step=None):
 
 def repack_archived_file(infile, backup_file=None, dry_run=False,
                          tmpbasedir=None):
-    """Repack an archived file."""
+    """Repack an archived file.
+
+    :param infile: path of the file to repack.
+    :param backup_file: path of the backup file (None if backup is not needed).
+    :param dry_run: True if dry run.
+    :param tmpbasedir: temporary directory for repack (None for automatic dir).
+    """
     from subprocess import check_call, DEVNULL
     from glob import glob
     from tempfile import TemporaryDirectory
