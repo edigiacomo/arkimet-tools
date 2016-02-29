@@ -127,7 +127,8 @@ class DeleteMerger(object):
         from tempfile import NamedTemporaryFile
         simple_merger(old_data, new_data, old_dsconf, new_dsconf)
         with NamedTemporaryFile() as fp:
-            check_call(["arki-query", "-o", fp.name, query, "-C", new_dsconf])
+            check_call(["arki-query", "-o", fp.name, self.query, "-C",
+                        new_dsconf])
             fp.flush()
             check_call(["arki-check", "--remove="+fp.name, "-C", new_dsconf])
 
