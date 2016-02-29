@@ -116,7 +116,7 @@ def main():
     )
     report_merged_data_p.add_argument("-m", "--merger-type",
                                       choices=["simple", "vm2flags",
-                                               "vm2flags-B33196",],
+                                               "vm2flags-B33196"],
                                       default="simple")
     report_merged_data_p.add_argument("-d", "--to-delete-file", required=True)
     report_merged_data_p.add_argument('-o', '--outfile', required=True)
