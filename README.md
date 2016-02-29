@@ -41,3 +41,12 @@ You can choose the merge type with `-m TYPE`:
 - `simple`: the old data are ovewritten by the new ones.
 - `vm2flags` (**VM2 only**): only flags are updated.
 - `vm2flags-B33196` (**VM2 only**): only the `B33196` flag is updated.
+
+## Delete data from archived datasets
+
+`report-deleted-data` creates a file with the cleared data and print a list of
+files to delete.
+
+    $ arkitools-cli report-deleted-data --outfile=cleared.grib1 --to-delete-file=todelete.list conf "product: tp"
+    $ xargs -a todelete.list -n 10 -d '\n' rm -v   # remove the files from .archive
+    $ arki-scan --dispatch=conf merged.grib1
