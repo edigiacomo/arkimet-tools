@@ -160,9 +160,3 @@ def repack_archived_file(infile, backup_file=None, dry_run=False,
                 shutil.copyfile(infile, backup_file)
 
             shutil.copyfile(outfile, infile)
-
-
-def do_clone_dataset(args):
-    from arkitools.dataset import clone_dataset
-
-    return clone_dataset(src_ds=args.srcds, dst_ds=args.dstds)

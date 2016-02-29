@@ -18,6 +18,12 @@
 # Author: Emanuele Di Giacomo <edigiacomo@arpa.emr.it>
 
 
+def do_clone_dataset(args):
+    from arkitools.dataset import clone_dataset
+
+    return clone_dataset(src_ds=args.srcds, dst_ds=args.dstds)
+
+
 def do_which_datasets(args):
     from arkitools.dataset import which_datasets
 
@@ -81,6 +87,7 @@ def main():
     )
     clone_dataset_p.add_argument('srcds', help='Source dataset')
     clone_dataset_p.add_argument('dstds', help='Destination dataset')
+    clone_dataset_p.set_defaults(func=do_clone_dataset)
 
     # Repack archived file
     repack_archived_file_p = subparsers.add_parser(
