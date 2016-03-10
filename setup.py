@@ -12,4 +12,5 @@ setup(
     entry_points={
         'console_scripts': ['arkitools-cli=arkitools.cli:main'],
     },
+    test_suite="arkitools",
 )
